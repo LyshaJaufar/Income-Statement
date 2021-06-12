@@ -67,6 +67,7 @@ depreciationExists = False
 otherOperatingExpensesExists = False
 telephoneExists = False
 heatingAndLightingExists = False
+commissionExists = False
 
 expenses = 0
 income = 0
@@ -184,6 +185,11 @@ for row in csvReader:
         rent = int(row['2'])
         rentExists = True
         expenses += rent
+
+    if ("commission", row['Details'], re.IGNORECASE):
+        commission = int(row['2'])
+        commissionExists = True
+        expenses += commission
 
     if ("interest", row['Details'], re.IGNORECASE):
         interest = int(row['2'])
@@ -366,6 +372,104 @@ for row in formatReader:
 
     if row['Details'] == "IncomeAndGP":
         row['3'] = income + grossProfit
+
+
+    # Expenses
+    if row['Details'] == "Commission":
+        if commissionExists == True:
+            row['2'] = commission
+        else:
+            writeRow = False
+
+    if row['Details'] == "Rent":
+        if rentExists == True:
+            row['2'] = rent
+        else:
+            writeRow = False
+
+    if row['Details'] == "Salaries and Wages":
+        if salariesAndWagesExists == True:
+            row['2'] = salariesAndWages
+        else:
+            writeRow = False
+
+    if row['Details'] == "Rent and rates":
+        if rentAndRatesExists == True:
+            row['2'] = rentAndRates
+        else:
+            writeRow = False
+
+    if row['Details'] == "Heating and Lighting":
+        if heatingAndLightingExists == True:
+            row['2'] = heatingAndLighting
+        else:
+            writeRow = False
+
+    if row['Details'] == "Insurance":
+        if insuranceExists == True:
+            row['2'] = insurance
+        else:
+            writeRow = False
+
+    if row['Details'] == "Interest":
+        if interestExists == True:
+            row['2'] = interest
+        else:
+            writeRow = False
+
+    if row['Details'] == "Bad debts":
+        if badDebtsExists == True:
+            row['2'] = badDebts
+        else:
+            writeRow = False
+
+    if row['Details'] == "Motor Expenses":
+        if motorExpensesExists == True:
+            row['2'] = motorExpenses
+        else:
+            writeRow = False
+
+    if row['Details'] == "General Expenses":
+        if generalExpensesExists == True:
+            row['2'] = generalExpenses
+        else:
+            writeRow = False
+
+    if row['Details'] == "Other Operating Expenses":
+        if otherOperatingExpensesExists == True:
+            row['2'] = otherOperatingExpenses
+        else:
+            writeRow = False
+
+    if row['Details'] == "Postage":
+        if postageExists == True:
+            row['2'] = postage
+        else:
+            writeRow = False
+
+    if row['Details'] == "Depreciation":
+        if depreciationExists == True:
+            row['2'] = depreciation
+        else:
+            writeRow = False
+
+    if row['Details'] == "Carriage Outwards":
+        if carriageOutwardsExists == True:
+            row['2'] = carriageOutwards
+        else:
+            writeRow = False
+
+    if row['Details'] == "Telephone expenses":
+        if telephoneExpensesExists == True:
+            row['2'] = telephoneExpenses
+        else:
+            writeRow = False
+
+    if row['Details'] == "Discount Allowed":
+        if discountAllowedExists == True:
+            row['2'] = discountAllowed
+        else:
+            writeRow = False
 
     if writeRow == True:
         csvWriter.writerow(row)
