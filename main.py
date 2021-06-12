@@ -33,20 +33,30 @@ csvWriter.writeheader()
 closedInventory = int(input("Enter closed inventory: "))
 
 
+salesReturnsExists = False
 for row in csvReader:
 
     # Store Revenue
     if row['Details'] == "Revenue":
         revenue = row['1']
-        print(revenue)
+    if row['Details'] == "Sales returns" or row['Details'] == "Returns inwards":
+        salesReturns = row['1']
+        salesReturnsExists = True
 
-      
 
 for row in formatReader:
+    writeRow = True
     if row['Details'] == "Revenue":
         row['3'] = revenue
-        print("yes")
-    csvWriter.writerow(row)
+    if row['Details'] == "Less:Sales returns":
+        if  salesReturnsExists == True:
+            row['3'] = salesReturns
+            print("yes")
+        else: 
+            writeRow = False
+
+    if writeRow == True:
+        csvWriter.writerow(row)
 
 
 # Close files
