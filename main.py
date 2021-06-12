@@ -3,22 +3,27 @@ import csv
 
 
 # Check for command-line args
-if len(argv) != 2:
+if len(argv) != 3:
     print("Error")
     exit(1)
 
-# Open the csv file
+# Open the csv file with the data
 database = open(argv[1], "r")
 if (database == None):
     exit(2)
 
+# Open the csv file with the format
+formatdata = open(argv[2], "r")
+if (formatdata == None):
+    exit(3)
 
 # Answer Sheet
 file = open('Income Statement Ans.csv', 'w', newline="")
 if (file == None):
-    exit(3)
+    exit(4)
 
 csvReader = csv.DictReader(database)
+formatReader = csv.DictReader(formatdata)
 fieldnames = ['Details','1','2','3']
 csvWriter = csv.DictWriter(file, fieldnames=fieldnames)
 
@@ -29,15 +34,18 @@ closedInventory = int(input("Enter closed inventory: "))
 
 
 for row in csvReader:
-    # Variables for each 
-    row['details'].lower == "Revenue"
-    # Calculate fixed cost
-    if row['1'].lower() == "":
-        if row['details'].lower == "Revenue":
-            revenue = 90
-        print("yes")
-        row['1'] = 3
 
+    # Store Revenue
+    if row['Details'] == "Revenue":
+        revenue = row['1']
+        print(revenue)
+
+      
+
+for row in formatReader:
+    if row['Details'] == "Revenue":
+        row['3'] = revenue
+        print("yes")
     csvWriter.writerow(row)
 
 
