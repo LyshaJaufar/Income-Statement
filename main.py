@@ -38,10 +38,16 @@ for row in csvReader:
 
     # Store Revenue
     if row['Details'] == "Revenue":
-        revenue = row['1']
+        revenue = int(row['1'])
+        netRevenue = revenue
+
     if row['Details'] == "Sales returns" or row['Details'] == "Returns inwards":
         salesReturns = row['1']
+        netRevenue = revenue - int(row['1'])
         salesReturnsExists = True
+
+    if row['Details'] == "Inventory".RE.SEARCH():
+        openingInventory = row['1']
 
 
 for row in formatReader:
@@ -51,9 +57,11 @@ for row in formatReader:
     if row['Details'] == "Less:Sales returns":
         if  salesReturnsExists == True:
             row['3'] = salesReturns
-            print("yes")
         else: 
             writeRow = False
+
+    if row['Details'] == "Net Revenue":
+        row['3'] = netRevenue
 
     if writeRow == True:
         csvWriter.writerow(row)
