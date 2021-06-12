@@ -1,6 +1,10 @@
 from sys import argv, exit
 import re, csv
 
+
+
+# take note of heating and lighting
+
 # Check for command-line args
 if len(argv) != 3:
     print("Error")
@@ -60,7 +64,7 @@ rentAndRatesExists = False
 discountAllowedExists = False
 motorExpensesExists = False
 rentExists = False
-badDebtExists = False
+badDebtsExists = False
 generalExpensesExists = False
 postageExists = False
 depreciationExists = False
@@ -68,6 +72,10 @@ otherOperatingExpensesExists = False
 telephoneExists = False
 heatingAndLightingExists = False
 commissionExists = False
+carriageOnSalesExists = False
+carriageOnPurchasesExists = False
+loanInterestExists = False
+telephoneExpensesExists = False
 
 expenses = 0
 income = 0
@@ -90,12 +98,23 @@ for row in csvReader:
     if re.search("inventory", row['Details'], re.IGNORECASE):
         openingInventory = int(row['1'])
 
-    if re.search("purchases", row['Details'], re.IGNORECASE):
+    if row['Details'] == 'Purchases':
+        purchases = int(row['1'])
+        netPurchases = purchases
+        finalNetPurchases = netPurchases
+
+    if row['Details'] == 'Purchases of materials':
         purchases = int(row['1'])
         netPurchases = purchases
         finalNetPurchases = netPurchases
 
     if re.search("carriage inwards", row['Details'], re.IGNORECASE):
+        carriageInwards = int(row['1'])
+        carriageInwardsExists = True
+        netPurchases += carriageInwards
+        finalNetPurchases = netPurchases
+
+    if re.search("carriage on purchases", row['Details'], re.IGNORECASE):
         carriageInwards = int(row['1'])
         carriageInwardsExists = True
         netPurchases += carriageInwards
@@ -119,20 +138,19 @@ for row in csvReader:
         netPurchases += repackagingWages
         finalNetPurchases = netPurchases
 
-    if re.search("purchase returns", row['Details'], re.IGNORECASE):
+    if row['Details'] == 'Purchase returns':
         purchaseReturns = int(row['1'])
         purchaseReturnsExists = True
-        finalNetPurchases -= purchaseReturns
+        finalNetPurchases = finalNetPurchases
 
-    if re.search("return(s)? outwards", row['Details'], re.IGNORECASE):
+    if row['Details'] == 'Returns outwards':
         purchaseReturns = int(row['1'])
         purchaseReturnsExists = True
-        finalNetPurchases -= purchaseReturns
-
-    if re.search("goods drawings", row['Details'], re.IGNORECASE):
+        finalNetPurchases = finalNetPurchases
+    if row['Details'] == 'goods drawings':
         goodsDrawings = int(row['1'])
         goodsDrawingsExists = True
-        finalNetPurchases -= goodsDrawings
+        finalNetPurchases = finalNetPurchases
 
     # Incomes           
     if re.search("discount received", row['Details'], re.IGNORECASE):
@@ -162,84 +180,94 @@ for row in csvReader:
 
     # Expenses
     if re.search("carriage outwards", row['Details'], re.IGNORECASE):
-        carriageOutwards = int(row['2'])
+        carriageOutwards = int(row['1'])
+        carriageOutwardsExists = True
+        expenses += carriageOutwards
+
+    if re.search("carriage on sales", row['Details'], re.IGNORECASE):
+        carriageOutwards = int(row['1'])
         carriageOutwardsExists = True
         expenses += carriageOutwards
 
     if re.search("rent and rates", row['Details'], re.IGNORECASE):
-        rentAndRates = int(row['2'])
+        rentAndRates = int(row['1'])
         rentAndRatesExists = True
         expenses += rentAndRates
 
     if re.search("discount allowed", row['Details'], re.IGNORECASE):
-        discountAllowed = int(row['2'])
+        discountAllowed = int(row['1'])
         discountAllowedExists = True
         expenses += discountAllowed
 
-    if ("insurance", row['Details'], re.IGNORECASE):
-        insurance = int(row['2'])
+    if row['Details'] == 'Insurance':
+        insurance = int(row['1'])
         insuranceExists = True
         expenses += insurance
 
-    if ("rent", row['Details'], re.IGNORECASE):
-        rent = int(row['2'])
+    if row['Details'] == "Rent":
+        rent = int(row['1'])
         rentExists = True
         expenses += rent
 
-    if ("commission", row['Details'], re.IGNORECASE):
-        commission = int(row['2'])
+    if row['Details'] == "Commission":
+        commission = int(row['1'])
         commissionExists = True
         expenses += commission
 
-    if ("interest", row['Details'], re.IGNORECASE):
-        interest = int(row['2'])
+    if row['Details'] == "Interest":
+        interest = int(row['1'])
         interestExists = True
         expenses += interest
 
     if re.search("other operating expenses", row['Details'], re.IGNORECASE):
-        otherOperatingExpenses = int(row['2'])
+        otherOperatingExpenses = int(row['1'])
         otherOperatingExpensesExists = True
         expenses += otherOperatingExpenses
 
     if re.search("heating and lighting", row['Details'], re.IGNORECASE):
-        heatingAndLighting = int(row['2'])
+        heatingAndLighting = int(row['1'])
         heatingAndLightingExists = True
         expenses += heatingAndLighting
 
     if re.search("bad debts", row['Details'], re.IGNORECASE):
-        badDebts = int(row['2'])
+        badDebts = int(row['1'])
         badDebtsExists = True
         expenses += badDebts
 
     if re.search("postage", row['Details'], re.IGNORECASE):
-        postage = int(row['2'])
+        postage = int(row['1'])
         postageExists = True
         expenses += postage
 
     if re.search("general expenses", row['Details'], re.IGNORECASE):
-        generalExpenses = int(row['2'])
+        generalExpenses = int(row['1'])
         generalExpensesExists = True
         expenses += generalExpenses
 
     if re.search("telephone expenses", row['Details'], re.IGNORECASE):
-        telephoneExpenses = int(row['2'])
+        telephoneExpenses = int(row['1'])
         telephoneExpensesExists = True
         expenses += telephoneExpenses
 
     if re.search("motor expenses", row['Details'], re.IGNORECASE):
-        motorExpenses = int(row['2'])
+        motorExpenses = int(row['1'])
         motorExpensesExists = True
         expenses += motorExpenses
 
     if re.search("salaries and wages", row['Details'], re.IGNORECASE):
-        salariesAndWages = int(row['2'])
+        salariesAndWages = int(row['1'])
         salariesAndWagesExists = True
         expenses += salariesAndWages
 
     if re.search("depreciation", row['Details'], re.IGNORECASE):
-        depreciation = int(row['2'])
+        depreciation = int(row['1'])
         depreciationExists = True
         expenses += depreciation
+
+    if re.search("loan interest", row['Details'], re.IGNORECASE):
+        loanInterest = int(row['1'])
+        loanInterestExists = True
+        expenses += loanInterest
 
 
 print("Income: ", income)
@@ -285,6 +313,12 @@ for row in formatReader:
         else: 
             writeRow = False
 
+    if row['Details'] == "Add: Repackaging wages":
+        if  repackagingWagesExists == True:
+            row['1'] = repackagingWages
+        else: 
+            writeRow = False
+
     if row['Details'] == "Net purchases":
         row['1'] = netPurchases
 
@@ -300,34 +334,39 @@ for row in formatReader:
         else: 
             writeRow = False
 
-    if purchaseReturns == True:
+    if purchaseReturnsExists == True:
         if goodsDrawingsExists == False:
             if row['Details'] == "Less: Purchase returns":
-                row['2'] = finalNetPurchases     
+                row['2'] = finalNetPurchases - purchaseReturns   
+                finalNetP = finalNetPurchases - purchaseReturns   
 
-    if purchaseReturns == False:
+    if purchaseReturnsExists == False:
         if goodsDrawingsExists == True:
             if row['Details'] == "Less: Goods drawings":
-                row['2'] = finalNetPurchases
+                row['2'] = finalNetPurchases - goodsDrawings
+                finalNetP = finalNetPurchases - goodsDrawings
         if goodsDrawingsExists == False:
             if row['Details'] == "Net purchases":
-                row['2'] = finalNetPurchases        
+                row['2'] = finalNetPurchases 
+                finalNetP = finalNetPurchases       
 
     if goodsDrawingsExists == True:
         if purchaseReturnsExists == True: 
             if row['Details'] == "Less: Goods drawings":
-                row['2'] = finalNetPurchases
+                row['2'] = finalNetPurchases - (goodsDrawings + purchaseReturns)
+                finalNetP = finalNetPurchases - (goodsDrawings + purchaseReturns)
         if purchaseReturnsExists == False: 
             if row['Details'] == "Less: Goods drawings":
-                row['2'] = finalNetPurchases
+                row['2'] = finalNetPurchases - goodsDrawings
+                finalNetP = finalNetPurchases - goodsDrawings
 
     if goodsDrawingsExists == False:
         if purchaseReturnsExists == True: 
             if row['Details'] == "Less: Purchase returns":
-                row['2'] = finalNetPurchases
+                row['2'] = finalNetPurchases - purchaseReturns
 
     if row['Details'] == "Cost of sales":
-        costOfSales = int(finalNetPurchases) + int(openingInventory)
+        costOfSales = int(finalNetP) + int(openingInventory)
         row['2'] = costOfSales
 
     if row['Details'] == "Less: Closing inventory":
@@ -371,7 +410,8 @@ for row in formatReader:
             writeRow = False
 
     if row['Details'] == "IncomeAndGP":
-        row['3'] = income + grossProfit
+        incomeAndGP = income + grossProfit
+        row['3'] = incomeAndGP
 
 
     # Expenses
@@ -387,7 +427,7 @@ for row in formatReader:
         else:
             writeRow = False
 
-    if row['Details'] == "Salaries and Wages":
+    if row['Details'] == "Salaries and wages":
         if salariesAndWagesExists == True:
             row['2'] = salariesAndWages
         else:
@@ -399,7 +439,7 @@ for row in formatReader:
         else:
             writeRow = False
 
-    if row['Details'] == "Heating and Lighting":
+    if row['Details'] == "Heating and lighting":
         if heatingAndLightingExists == True:
             row['2'] = heatingAndLighting
         else:
@@ -423,19 +463,19 @@ for row in formatReader:
         else:
             writeRow = False
 
-    if row['Details'] == "Motor Expenses":
+    if row['Details'] == "Motor expenses":
         if motorExpensesExists == True:
             row['2'] = motorExpenses
         else:
             writeRow = False
 
-    if row['Details'] == "General Expenses":
+    if row['Details'] == "General expenses":
         if generalExpensesExists == True:
             row['2'] = generalExpenses
         else:
             writeRow = False
 
-    if row['Details'] == "Other Operating Expenses":
+    if row['Details'] == "Other operating expenses":
         if otherOperatingExpensesExists == True:
             row['2'] = otherOperatingExpenses
         else:
@@ -465,11 +505,20 @@ for row in formatReader:
         else:
             writeRow = False
 
-    if row['Details'] == "Discount Allowed":
+    if row['Details'] == "Discount allowed":
         if discountAllowedExists == True:
             row['2'] = discountAllowed
         else:
             writeRow = False
+
+    if row['Details'] == "Loan interest":
+        if loanInterestExists == True:
+            row['2'] = loanInterest
+        else:
+            writeRow = False
+
+    if row['Details'] == 'Net profit for the year':
+        row['3'] = int(incomeAndGP) - int(expenses)
 
     if writeRow == True:
         csvWriter.writerow(row)
