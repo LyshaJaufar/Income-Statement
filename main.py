@@ -32,8 +32,8 @@ csvWriter.writeheader()
 closingInventory = int(input("Enter closed inventory: "))
 additionalIncomes= False
 additionalExpenses = False
-askAdditionalIncomes = ("Do you wish to add anything extra to your incomes? ")
-askAdditionalTradeExpenses = ("Do you wish to deduct anything extra to your incomes? ")
+askAdditionalIncomes = input("Do you wish to add anything extra to your incomes? ")
+askAdditionalTradeExpenses = input("Do you wish to deduct anything extra to your incomes? ")
 if re.search("y(es)?", askAdditionalIncomes, re.IGNORECASE):
     addAdditionalIncomes = True
 if re.search("y(es)?", askAdditionalTradeExpenses, re.IGNORECASE):
@@ -51,6 +51,23 @@ interestReceivedExists = False
 rentReceievedExists = False
 financeIncomeExists = False
 commissionReceivedExists = False
+
+salariesAndWagesExists = False
+carriageOutwardsExists = False
+insuranceExists = False
+interestExists = False
+rentAndRatesExists = False
+discountAllowedExists = False
+motorExpensesExists = False
+rentExists = False
+badDebtExists = False
+generalExpensesExists = False
+postageExists = False
+depreciationExists = False
+otherOperatingExpensesExists = False
+telephoneExists = False
+heatingAndLightingExists = False
+
 expenses = 0
 income = 0
 for row in csvReader:
@@ -115,7 +132,8 @@ for row in csvReader:
         goodsDrawings = int(row['1'])
         goodsDrawingsExists = True
         finalNetPurchases -= goodsDrawings
-            
+
+    # Incomes           
     if re.search("discount received", row['Details'], re.IGNORECASE):
         discountReceived = int(row['2'])
         discountReceivedExists = True
@@ -141,11 +159,90 @@ for row in csvReader:
         commissionReceivedExists = True
         income += commissionReceived
 
+    # Expenses
+    if re.search("carriage outwards", row['Details'], re.IGNORECASE):
+        carriageOutwards = int(row['2'])
+        carriageOutwardsExists = True
+        expenses += carriageOutwards
+
+    if re.search("rent and rates", row['Details'], re.IGNORECASE):
+        rentAndRates = int(row['2'])
+        rentAndRatesExists = True
+        expenses += rentAndRates
+
+    if re.search("discount allowed", row['Details'], re.IGNORECASE):
+        discountAllowed = int(row['2'])
+        discountAllowedExists = True
+        expenses += discountAllowed
+
+    if ("insurance", row['Details'], re.IGNORECASE):
+        insurance = int(row['2'])
+        insuranceExists = True
+        expenses += insurance
+
+    if ("rent", row['Details'], re.IGNORECASE):
+        rent = int(row['2'])
+        rentExists = True
+        expenses += rent
+
+    if ("interest", row['Details'], re.IGNORECASE):
+        interest = int(row['2'])
+        interestExists = True
+        expenses += interest
+
+    if re.search("other operating expenses", row['Details'], re.IGNORECASE):
+        otherOperatingExpenses = int(row['2'])
+        otherOperatingExpensesExists = True
+        expenses += otherOperatingExpenses
+
+    if re.search("heating and lighting", row['Details'], re.IGNORECASE):
+        heatingAndLighting = int(row['2'])
+        heatingAndLightingExists = True
+        expenses += heatingAndLighting
+
+    if re.search("bad debts", row['Details'], re.IGNORECASE):
+        badDebts = int(row['2'])
+        badDebtsExists = True
+        expenses += badDebts
+
+    if re.search("postage", row['Details'], re.IGNORECASE):
+        postage = int(row['2'])
+        postageExists = True
+        expenses += postage
+
+    if re.search("general expenses", row['Details'], re.IGNORECASE):
+        generalExpenses = int(row['2'])
+        generalExpensesExists = True
+        expenses += generalExpenses
+
+    if re.search("telephone expenses", row['Details'], re.IGNORECASE):
+        telephoneExpenses = int(row['2'])
+        telephoneExpensesExists = True
+        expenses += telephoneExpenses
+
+    if re.search("motor expenses", row['Details'], re.IGNORECASE):
+        motorExpenses = int(row['2'])
+        motorExpensesExists = True
+        expenses += motorExpenses
+
+    if re.search("salaries and wages", row['Details'], re.IGNORECASE):
+        salariesAndWages = int(row['2'])
+        salariesAndWagesExists = True
+        expenses += salariesAndWages
+
+    if re.search("depreciation", row['Details'], re.IGNORECASE):
+        depreciation = int(row['2'])
+        depreciationExists = True
+        expenses += depreciation
+
+
 print("Income: ", income)
 print("Expenses: ", expenses)
 
 for row in formatReader:
     writeRow = True
+    
+    # Trading Section
     if row['Details'] == "Revenue":
         row['3'] = revenue
 
@@ -161,7 +258,6 @@ for row in formatReader:
     if row['Details'] == "Opening inventory":
         row['2'] = openingInventory
 
-    # Calculate net purchases
     if row['Details'] == 'Add: Purchases':
         row['1'] = purchases
 
@@ -237,6 +333,7 @@ for row in formatReader:
         grossProfit = int(netRevenue) - int(salesCostMinusCI)
         row['3'] = grossProfit
 
+    # Incomes
     if row['Details'] == "Discount received":
         if discountReceivedExists == True:
             row['2'] = discountReceived 
@@ -273,7 +370,7 @@ for row in formatReader:
     if writeRow == True:
         csvWriter.writerow(row)
 
-#if re.search("y(es)?", extendSequenceYesOrNo, re.IGNORECASE):
+
 # Close files
 database.close()
 file.close()
