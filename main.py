@@ -1,8 +1,6 @@
 from sys import argv, exit
 import re, csv
 
-
-
 # take note of heating and lighting
 
 # Check for command-line args
@@ -33,7 +31,7 @@ csvWriter = csv.DictWriter(file, fieldnames=fieldnames)
 csvWriter.writeheader()
 
 # Prompt for FC, VC and price
-closingInventory = int(input("Enter closed inventory: "))
+closingInventory = int(input("Enter closing inventory: "))
 additionalIncomes= False
 additionalExpenses = False
 askAdditionalIncomes = input("Do you wish to add anything extra to your incomes? ")
@@ -76,6 +74,8 @@ carriageOnSalesExists = False
 carriageOnPurchasesExists = False
 loanInterestExists = False
 telephoneExpensesExists = False
+officeExpensesExists = False
+salesStaffsCommissionExists = False
 
 expenses = 0
 income = 0
@@ -98,17 +98,18 @@ for row in csvReader:
     if re.search("inventory", row['Details'], re.IGNORECASE):
         openingInventory = int(row['1'])
 
-    if row['Details'] == 'Purchases':
-        purchases = int(row['1'])
-        netPurchases = purchases
-        finalNetPurchases = netPurchases
-
-    if row['Details'] == 'Purchases of materials':
+    if re.search("purchase(s of materials)?", row['Details'], re.IGNORECASE):
         purchases = int(row['1'])
         netPurchases = purchases
         finalNetPurchases = netPurchases
 
     if re.search("carriage inwards", row['Details'], re.IGNORECASE):
+        carriageInwards = int(row['1'])
+        carriageInwardsExists = True
+        netPurchases += carriageInwards
+        finalNetPurchases = netPurchases
+
+    if re.search("carriage on material(s)?", row['Details'], re.IGNORECASE):
         carriageInwards = int(row['1'])
         carriageInwardsExists = True
         netPurchases += carriageInwards
@@ -138,16 +139,17 @@ for row in csvReader:
         netPurchases += repackagingWages
         finalNetPurchases = netPurchases
 
-    if row['Details'] == 'Purchase returns':
+    if row['Details'].lower() == 'purchase(s) return(s)':
         purchaseReturns = int(row['1'])
         purchaseReturnsExists = True
         finalNetPurchases = finalNetPurchases
 
-    if row['Details'] == 'Returns outwards':
+    if row['Details'].lower() == 'return(s)? outward(s)?':
         purchaseReturns = int(row['1'])
         purchaseReturnsExists = True
         finalNetPurchases = finalNetPurchases
-    if row['Details'] == 'goods drawings':
+
+    if row['Details'].lower() == 'goods drawings':
         goodsDrawings = int(row['1'])
         goodsDrawingsExists = True
         finalNetPurchases = finalNetPurchases
@@ -199,20 +201,26 @@ for row in csvReader:
         discountAllowedExists = True
         expenses += discountAllowed
 
-    if row['Details'] == 'Insurance':
+    if row['Details'].lower() == 'insurance':
         insurance = int(row['1'])
         insuranceExists = True
         expenses += insurance
 
-    if row['Details'] == "Rent":
+    if row['Details'].lower() == "rent":
         rent = int(row['1'])
         rentExists = True
         expenses += rent
 
-    if row['Details'] == "Commission":
+    if row['Details'].lower() == "commission":
         commission = int(row['1'])
         commissionExists = True
         expenses += commission
+
+
+    if re.search("sales staff(s)? commission", row['Details'], re.IGNORECASE):
+        salesStaffsCommission = int(row['1'])
+        salesStaffsCommissionExists = True
+        expenses += salesStaffsCommission
 
     if row['Details'] == "Interest":
         interest = int(row['1'])
@@ -225,6 +233,11 @@ for row in csvReader:
         expenses += otherOperatingExpenses
 
     if re.search("heating and lighting", row['Details'], re.IGNORECASE):
+        heatingAndLighting = int(row['1'])
+        heatingAndLightingExists = True
+        expenses += heatingAndLighting
+
+    if re.search("lighting and heating", row['Details'], re.IGNORECASE):
         heatingAndLighting = int(row['1'])
         heatingAndLightingExists = True
         expenses += heatingAndLighting
@@ -249,12 +262,17 @@ for row in csvReader:
         telephoneExpensesExists = True
         expenses += telephoneExpenses
 
-    if re.search("motor expenses", row['Details'], re.IGNORECASE):
+    if re.search("motor expense(s)?", row['Details'], re.IGNORECASE):
         motorExpenses = int(row['1'])
         motorExpensesExists = True
         expenses += motorExpenses
 
     if re.search("salaries and wages", row['Details'], re.IGNORECASE):
+        salariesAndWages = int(row['1'])
+        salariesAndWagesExists = True
+        expenses += salariesAndWages
+
+    if re.search("wages and salaries", row['Details'], re.IGNORECASE):
         salariesAndWages = int(row['1'])
         salariesAndWagesExists = True
         expenses += salariesAndWages
@@ -268,6 +286,11 @@ for row in csvReader:
         loanInterest = int(row['1'])
         loanInterestExists = True
         expenses += loanInterest
+
+    if re.search("office(s)? expenses", row['Details'], re.IGNORECASE):
+        officeExpenses = int(row['1'])
+        officeExpensesExists = True
+        expenses += officeExpenses
 
 
 print("Income: ", income)
@@ -421,6 +444,12 @@ for row in formatReader:
         else:
             writeRow = False
 
+    if row['Details'] == "Sales staffs commission":
+        if salesStaffsCommissionExists == True:
+            row['2'] = salesStaffsCommission
+        else:
+            writeRow = False
+
     if row['Details'] == "Rent":
         if rentExists == True:
             row['2'] = rent
@@ -514,6 +543,12 @@ for row in formatReader:
     if row['Details'] == "Loan interest":
         if loanInterestExists == True:
             row['2'] = loanInterest
+        else:
+            writeRow = False
+
+    if row['Details'] == "Office expenses":
+        if officeExpensesExists == True:
+            row['2'] = officeExpenses
         else:
             writeRow = False
 
