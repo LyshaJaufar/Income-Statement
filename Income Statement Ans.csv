@@ -1,22 +1,18 @@
 Details,1,2,3
-Revenue,,,166500
-Net Revenue,,,166500
+Revenue,,,35000
+Less:Sales returns,,,560
+Net Revenue,,,34440
 LESS:COST OF SALES,,, 
-Opening inventory,,24550, 
-Add: Purchases,92000,, 
-Add: Carriage inwards,6500,,
-Net purchases,98500,98500,
-Cost of sales,,123050,
-Less: Closing inventory,,11000,112050
-Gross Profit,,,54450
+Opening inventory,,8700, 
+Add: Purchases,19500,, 
+Add: Carriage inwards,500,,
+Net purchases,20000,20000,
+Cost of sales,,28700,
+Less: Closing inventory,,9000,19700
+Gross Profit,,,14740
 Add: Income,,,
-IncomeAndGP,,,54450
+Discount received,,900, 
+IncomeAndGP,,,15640
 LESS: EXPENSES,,, 
-Salaries and wages,,12370,
-Heating and lighting,,2410,
-Bad debts,,900,
-Carriage Outwards,,3400,
-Sales staffs commission,,7000,
-Insurance,,3610,
-Office expenses,,9550,
-Net profit for the year,,,15210
+Rent,,3600,
+Net profit for the year,,,12040

@@ -292,6 +292,11 @@ for row in csvReader:
         officeExpensesExists = True
         expenses += officeExpenses
 
+    if re.search("office(s)? salaries", row['Details'], re.IGNORECASE):
+        officeSalaries = int(row['1'])
+        officeSalariesExists = True
+        expenses += officeSalaries
+
 
 print("Income: ", income)
 print("Expenses: ", expenses)
@@ -549,6 +554,12 @@ for row in formatReader:
     if row['Details'] == "Office expenses":
         if officeExpensesExists == True:
             row['2'] = officeExpenses
+        else:
+            writeRow = False
+
+    if row['Details'] == "Office salaries":
+        if officeSalariesExists == True:
+            row['2'] = officeSalaries
         else:
             writeRow = False
 
